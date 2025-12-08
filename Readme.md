@@ -36,6 +36,14 @@ gcloud services enable \
     aiplatform.googleapis.com
 ```
 
+#### Note: Creating service account keys in Terraform is not recommended
+As it stores sensitive credentials in the state file.
+It is better to manage keys manually or through a secrets manager.
+The original script had:
+```bash
+gcloud iam service-accounts keys create key.json --iam-account=cloud-ai-police-sa@cloud-ai-police.iam.gserviceaccount.com
+```
+
 ## Terraform Usage & The Concept of "Sync"
 
 While Terraform doesn't have a specific `sync` command, the core workflow is designed to synchronize your cloud infrastructure with the state defined in your `.tf` configuration files. This is achieved through the following commands:
@@ -65,4 +73,3 @@ While Terraform doesn't have a specific `sync` command, the core workflow is des
 
 *   **`terraform refresh`**: This command updates the Terraform state file to match the real-world state of your infrastructure. It doesn't modify your infrastructure, but it's useful for reconciling any "drift" that may have occurred outside of Terraform.
 *   **`terraform import`**: This command allows you to bring existing cloud resources under Terraform management, effectively "syncing" them with your configuration.
-
