@@ -4,6 +4,18 @@ locals {
   
   service_account_display_name = "cloud-ai-police-sa"
 
+  apis_to_enable = [
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "storage.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "aiplatform.googleapis.com",
+    "container.googleapis.com",
+    "run.googleapis.com",
+    "logging.googleapis.com",
+    "monitoring.googleapis.com"
+  ]
+
   bucket = {
     name   = "cloud-ai-police-bucket-0"
     region = local.gcp_region
@@ -29,15 +41,8 @@ locals {
     "roles/storage.objectCreator",
     "roles/aiplatform.admin",
     "roles/container.admin",
-  ]
-
-  apis_to_enable = [
-    "iam.googleapis.com",
-    "cloudresourcemanager.googleapis.com",
-    "storage.googleapis.com",
-    "artifactregistry.googleapis.com",
-    "aiplatform.googleapis.com",
-    "container.googleapis.com",
+    "roles/logging.admin",
+    "roles/monitoring.admin"
   ]
 
   gke = {
@@ -50,5 +55,11 @@ locals {
     max_node_count     = 1
     disk_size_gb       = 30
     disk_type          = "pd-standard"
+  }
+
+  log_sink = {
+    name        = "cloud-ai-police-log-gcs-sink"
+    destination = "storage.googleapis.com/${local.bucket.name}"
+    filter      = "resource.type=\"k8s_container\" AND severity>=WARNING"
   }
 }
