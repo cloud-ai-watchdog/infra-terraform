@@ -27,5 +27,14 @@ locals {
     "roles/storage.objectAdmin",
     "roles/storage.objectViewer",
     "roles/storage.objectCreator",
+    "roles/aiplatform.admin",
+  ]
+
+  apis_to_enable = [
+    "iam.googleapis.com",
+    "cloudresourcemanager.googleapis.com",
+    "storage.googleapis.com",
+    "artifactregistry.googleapis.com",
+    "aiplatform.googleapis.com",
   ]
 }

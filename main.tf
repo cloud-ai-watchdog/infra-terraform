@@ -1,3 +1,10 @@
+# Enable Required Google Cloud APIs
+resource "google_project_service" "apis" {
+  for_each = toset(local.apis_to_enable)
+  project  = local.gcp_project_id
+  service  = each.value
+}
+
 # Service Account
 resource "google_service_account" "service_account" {
   account_id   = local.service_account_display_name
@@ -11,6 +18,7 @@ resource "google_project_iam_member" "service_account_iam" {
   project  = local.gcp_project_id
   role     = each.value
   member   = "serviceAccount:${google_service_account.service_account.email}"
+  depends_on = [ google_project_service.apis , google_service_account.service_account ]
 }
 
 # GCS Bucket
@@ -19,6 +27,7 @@ resource "google_storage_bucket" "bucket" {
   location      = local.bucket.region
   project       = local.gcp_project_id
   uniform_bucket_level_access = true
+  depends_on = [ google_project_service.apis ]
 }
 
 # Google Artifact Registry Repository
@@ -28,6 +37,7 @@ resource "google_artifact_registry_repository" "repository" {
   repository_id = local.gar.repository_id
   description   = local.gar.description
   format        = local.gar.format
+  depends_on = [ google_project_service.apis ]
 }
 
 # Note: Creating service account keys in Terraform is not recommended

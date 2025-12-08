@@ -32,31 +32,37 @@ gcloud services enable \
     iam.googleapis.com \
     cloudresourcemanager.googleapis.com \
     storage.googleapis.com \
-    artifactregistry.googleapis.com
+    artifactregistry.googleapis.com \
+    aiplatform.googleapis.com
 ```
 
-## Terraform Usage
+## Terraform Usage & The Concept of "Sync"
 
-To apply this Terraform configuration, follow these steps:
+While Terraform doesn't have a specific `sync` command, the core workflow is designed to synchronize your cloud infrastructure with the state defined in your `.tf` configuration files. This is achieved through the following commands:
 
 1.  **Initialize Terraform:**
-    This command initializes the working directory, downloading the necessary provider plugins.
+    This command initializes the working directory, downloading the necessary provider plugins. It's the first command you run in a new or existing Terraform configuration.
 
     ```bash
     terraform init
     ```
 
-2.  **Plan the changes:**
-    This command creates an execution plan, which lets you preview the changes that Terraform plans to make to your infrastructure.
+2.  **Plan the changes (The "Dry Run"):**
+    This command creates an execution plan. It's a crucial "dry run" step that shows you what Terraform *will* do to your infrastructure to make it match your configuration. It's how you review and verify changes before applying them.
 
     ```bash
     terraform plan
     ```
 
-3.  **Apply the changes:**
-    This command applies the changes required to reach the desired state of the configuration.
+3.  **Apply the changes (The "Sync"):**
+    This is the command that performs the actual synchronization. It applies the changes outlined in the plan to your cloud resources, bringing your infrastructure into the desired state.
 
     ```bash
     terraform apply
     ```
+
+### Other "Sync"-Related Commands
+
+*   **`terraform refresh`**: This command updates the Terraform state file to match the real-world state of your infrastructure. It doesn't modify your infrastructure, but it's useful for reconciling any "drift" that may have occurred outside of Terraform.
+*   **`terraform import`**: This command allows you to bring existing cloud resources under Terraform management, effectively "syncing" them with your configuration.
 
