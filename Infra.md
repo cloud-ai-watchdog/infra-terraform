@@ -4,48 +4,37 @@ This document provides a high-level overview of the infrastructure managed by th
 
 ```mermaid
 graph TD
-    subgraph GCP Project
-        A[GCP Project: cloud-ai-police]
+    subgraph "GCP Project: cloud-ai-police"
+        GKE("GKE Cluster");
+        SA("Service Account");
+        GCS("GCS Bucket (Data)");
+        GAR("Artifact Registry (Docker Images)");
+        VertexAI("Vertex AI (ML Workloads)");
+        IAM("IAM Roles");
     end
 
-    subgraph "Service Account & IAM"
-        B[Service Account: cloud-ai-police-sa]
-        C{IAM Roles}
-        B -- "Granted" --> C
-        C -- "Permissions For" --> D[GCS Bucket]
-        C -- "Permissions For" --> E[Artifact Registry]
-        C -- "Permissions For" --> F[GKE Cluster]
-        C -- "Permissions For" --> G[Vertex AI]
+    subgraph "External"
+        Developer("Developer / CI/CD");
     end
 
-    subgraph "Storage & Artifacts"
-        D -- "Stores Data"
-        E -- "Stores Docker Images"
-    end
+    Developer -- "1. Push Docker Image" --> GAR;
+    GKE -- "2. Pull Docker Image" --> GAR;
+    GKE -- "3. Use for runtime" --> SA;
+    SA -- "4. Granted permissions by" --> IAM;
+    IAM -- "5. Allows SA to access" --> GCS;
+    IAM -- "5. Allows SA to access" --> VertexAI;
+    GKE -- "6. Read/Write Data" --> GCS;
+    VertexAI -- "7. Read/Write Data & Models" --> GCS;
 
-    subgraph "Compute & AI"
-        F -- "Runs Containerized Applications"
-        G -- "Used for ML Workloads"
-    end
-
-    A -- "Contains" --> B
-    A -- "Contains" --> D
-    A -- "Contains" --> E
-    A -- "Contains" --> F
-    A -- "Contains" --> G
 ```
 
 ## Explanation of the Flow
 
 1.  **GCP Project:** The `cloud-ai-police` project is the top-level container for all the resources.
-2.  **Service Account:** A dedicated service account, `cloud-ai-police-sa`, is created within the project to manage and interact with other resources.
-3.  **IAM Roles:** The service account is granted a set of IAM roles that give it specific permissions.
-4.  **Resource Permissions:** These permissions allow the service account to:
-    *   Read from and write to the **GCS Bucket**.
-    *   Push and pull images from the **Artifact Registry**.
-    *   Manage and interact with the **GKE Cluster**.
-    *   Administer **Vertex AI** resources.
-5.  **Information Flow:**
-    *   The **GKE Cluster** can pull container images from the **Artifact Registry** to run applications.
-    *   Applications running on the **GKE Cluster** can use the service account's permissions to access the **GCS Bucket** for data storage and retrieval.
-    *   The **GKE Cluster** and other resources can interact with **Vertex AI** for machine learning tasks.
+2.  **Service Account (SA):** A dedicated service account is used by resources within the project to interact with each other securely.
+3.  **IAM Roles:** The service account is granted specific permissions through IAM roles, defining what it's allowed to do.
+4.  **Resource Interactions:**
+    *   **Developer/CI-CD:** Pushes Docker container images to the **Artifact Registry (GAR)**.
+    *   **GKE Cluster:** Pulls these images from GAR to run applications. The cluster uses the **Service Account** to authenticate with other Google Cloud services.
+    *   **GCS Bucket:** Stores and serves data. Both the **GKE Cluster** and **Vertex AI** can read from and write to the bucket, as allowed by the IAM roles.
+    *   **Vertex AI:** Used for machine learning workloads, often accessing data from the **GCS Bucket**.
