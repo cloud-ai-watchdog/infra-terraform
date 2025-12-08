@@ -60,6 +60,6 @@ locals {
   log_sink = {
     name        = "cloud-ai-police-log-gcs-sink"
     destination = "storage.googleapis.com/${local.bucket.name}"
-    filter      = "resource.type=\"k8s_container\" AND severity>=WARNING"
+    filter      = "resource.labels.namespace_name=\"default\" AND severity>=WARNING"
   }
 }
