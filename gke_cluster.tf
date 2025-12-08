@@ -1,0 +1,45 @@
+# GKE Cluster
+resource "google_container_cluster" "primary" {
+  name     = local.gke.name
+  location = local.gke.location
+
+  remove_default_node_pool = true
+  initial_node_count       = 1
+
+  networking_mode = "VPC_NATIVE"
+
+  depends_on = [
+    google_project_service.apis,
+    google_service_account.service_account,
+  ]
+}
+
+# Managed node pool with autoscaling (min = max = 1)
+resource "google_container_node_pool" "primary_pool" {
+  name       = local.gke.node_pool_name
+  cluster    = google_container_cluster.primary.name
+  location   = local.gke.location
+
+  node_config {
+    machine_type = local.gke.node_machine_type
+    disk_size_gb = local.gke.disk_size_gb
+    disk_type    = local.gke.disk_type
+    service_account = google_service_account.service_account.email
+    oauth_scopes = [
+      "https://www.googleapis.com/auth/cloud-platform",
+    ]
+  }
+
+  autoscaling {
+    min_node_count = local.gke.min_node_count
+    max_node_count = local.gke.max_node_count
+  }
+
+  initial_node_count = local.gke.initial_node_count
+
+  depends_on = [
+    google_project_service.apis,
+    google_service_account.service_account,
+    google_container_cluster.primary,
+  ]
+}

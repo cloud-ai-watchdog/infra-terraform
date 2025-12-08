@@ -28,6 +28,7 @@ locals {
     "roles/storage.objectViewer",
     "roles/storage.objectCreator",
     "roles/aiplatform.admin",
+    "roles/container.admin",
   ]
 
   apis_to_enable = [
@@ -36,5 +37,18 @@ locals {
     "storage.googleapis.com",
     "artifactregistry.googleapis.com",
     "aiplatform.googleapis.com",
+    "container.googleapis.com",
   ]
+
+  gke = {
+    name               = "cloud-ai-police-gke"
+    location           = "us-central1-a" # To avoid zonal SSD limitation issues
+    initial_node_count = 1
+    node_machine_type  = "e2-medium"
+    node_pool_name     = "default-pool"
+    min_node_count     = 1
+    max_node_count     = 1
+    disk_size_gb       = 30
+    disk_type          = "pd-standard"
+  }
 }
