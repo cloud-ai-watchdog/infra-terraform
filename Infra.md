@@ -11,6 +11,7 @@ graph TD
         GAR("Artifact Registry (Docker Images)");
         VertexAI("Vertex AI (ML Workloads)");
         IAM("IAM Roles");
+        LOGSINK("Logging Sink to GCS");
     end
 
     subgraph "External"
@@ -25,7 +26,10 @@ graph TD
     IAM -- "5. Allows SA to access" --> VertexAI;
     GKE -- "6. Read/Write Data" --> GCS;
     VertexAI -- "7. Read/Write Data & Models" --> GCS;
-
+    LOGSINK -- "8. Store Logs" --> GCS;
+    GKE -. "Send Logs" .-> LOGSINK;
+    IAM -. "Send Logs" .-> LOGSINK;
+    GAR -. "Send Logs" .-> LOGSINK;
 ```
 
 ## Explanation of the Flow
