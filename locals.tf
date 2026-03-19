@@ -1,8 +1,8 @@
 locals {
-  gcp_project_id               = "cloud-ai-police"
+  gcp_project_id               = "cloud-ai-police-v2"
   gcp_region                   = "us-central1"
   
-  service_account_display_name = "cloud-ai-police-sa"
+  service_account_display_name = "cloud-ai-police-v2-sa"
 
   apis_to_enable = [
     "iam.googleapis.com",
@@ -17,14 +17,14 @@ locals {
   ]
 
   bucket = {
-    name   = "cloud-ai-police-bucket-0"
+    name   = "cloud-ai-police-v2-bucket-0"
     region = local.gcp_region
   }
 
   gar = {
-    repository_id = "cloud-ai-police-gar"
+    repository_id = "cloud-ai-police-v2-gar"
     location      = local.gcp_region
-    description   = "Docker repository for cloud-ai-police"
+    description   = "Docker repository for cloud-ai-police-v2"
     format        = "DOCKER"
   }
 
@@ -46,7 +46,7 @@ locals {
   ]
 
   gke = {
-    name               = "cloud-ai-police-gke"
+    name               = "cloud-ai-police-v2-gke"
     location           = "us-central1-a" # To avoid zonal SSD limitation issues
     initial_node_count = 1
     node_machine_type  = "e2-medium"
@@ -58,7 +58,7 @@ locals {
   }
 
   log_sink = {
-    name        = "cloud-ai-police-log-gcs-sink"
+    name        = "cloud-ai-police-v2-log-gcs-sink"
     destination = "storage.googleapis.com/${local.bucket.name}"
     filter      = "resource.labels.namespace_name=\"default\" AND severity>=WARNING"
   }

@@ -3,7 +3,7 @@ resource "google_storage_bucket" "bucket" {
   name          = local.bucket.name
   location      = local.bucket.region
   project       = local.gcp_project_id
-  uniform_bucket_level_access = true
+  uniform_bucket_level_access = false
   depends_on = [ google_project_service.apis ]
 }
 

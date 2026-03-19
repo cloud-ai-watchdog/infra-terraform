@@ -21,9 +21,9 @@ gcloud auth login
 gcloud auth application-default login
 
 # Set your project configuration
-gcloud config set project cloud-ai-police
+gcloud config set project cloud-ai-police-v2
 ```
-Note: Replace `cloud-ai-police` with your actual GCP Project ID if it's different. The project ID is also configured in `locals.tf`.
+Note: Replace `cloud-ai-police-v2` with your actual GCP Project ID if it's different. The project ID is also configured in `locals.tf`.
 
 ### 2. Enable Required Google Cloud APIs
 Enable the necessary APIs for the project. This command only needs to be run once per project.
@@ -41,7 +41,7 @@ As it stores sensitive credentials in the state file.
 It is better to manage keys manually or through a secrets manager.
 The original script had:
 ```bash
-gcloud iam service-accounts keys create key.json --iam-account=cloud-ai-police-sa@cloud-ai-police.iam.gserviceaccount.com
+gcloud iam service-accounts keys create key.json --iam-account=cloud-ai-police-v2-sa@cloud-ai-police-v2.iam.gserviceaccount.com
 ```
 
 ## Terraform Usage & The Concept of "Sync"
