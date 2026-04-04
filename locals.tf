@@ -3,6 +3,7 @@ locals {
   gcp_region                   = "us-central1"
   
   service_account_display_name = "cloud-ai-police-v2-sa"
+  hello_world_sa = "hello-world-sa"
 
   apis_to_enable = [
     "iam.googleapis.com",
