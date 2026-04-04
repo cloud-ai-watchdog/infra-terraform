@@ -7,6 +7,7 @@ resource "google_project_iam_member" "service_account_iam" {
   depends_on = [ google_project_service.apis , google_service_account.service_account ]
 }
 
+# IAM Policy Bindings for Hello World Service Account
 resource "google_project_iam_member" "hello_world_sa_iam" {
   for_each = toset(local.iam_roles)
   project  = local.gcp_project_id
@@ -22,3 +23,11 @@ resource "google_project_iam_member" "hello_world_sa_iam" {
 #   member  = "user:ddruk2018@gmail.com"
 #   depends_on = [ google_project_service.apis ]
 # }
+
+# Grant Cloud Run Invoker role to all users (public access)
+resource "google_cloud_run_service_iam_member" "public" {
+  service  = google_cloud_run_service.hello_world_node_frontend.name
+  location = local.cloud_run.location
+  role     = "roles/run.invoker"
+  member   = "allUsers"
+}

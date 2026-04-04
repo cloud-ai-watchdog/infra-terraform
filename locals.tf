@@ -63,4 +63,9 @@ locals {
     destination = "storage.googleapis.com/${local.bucket.name}"
     filter      = "resource.labels.namespace_name=\"default\" AND severity>=WARNING"
   }
+
+  cloud_run = {
+    hello_world_node_frontend = "hello-world-node-frontend"
+    location     = local.gcp_region
+  }
 }

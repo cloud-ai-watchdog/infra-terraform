@@ -17,3 +17,8 @@ output "gar_repository_name" {
   description = "The name of the GAR repository."
   value       = google_artifact_registry_repository.repository.name
 }
+
+output "hello_world_node_frontend_service_url" {
+  description = "The Service URL of the hello-world-node-frontend service."
+  value = google_cloud_run_service.hello_world_node_frontend.status[0].url
+}
