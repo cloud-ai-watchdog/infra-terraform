@@ -67,5 +67,7 @@ locals {
   cloud_run = {
     hello_world_node_frontend = "hello-world-node-frontend"
     location     = local.gcp_region
+
+    dummy_domain_name = "hello-world-node-frontend.gcp.com"
   }
 }

@@ -31,3 +31,11 @@ resource "google_cloud_run_service_iam_member" "public" {
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
+
+# Grant Cloud Run Invoker role to Hello World service account
+resource "google_cloud_run_service_iam_member" "lb_invoker" {
+  service  = google_cloud_run_service.hello_world_node_frontend.name
+  location = local.cloud_run.location
+  role     = "roles/run.invoker"
+  member   = "serviceAccount:${google_service_account.hello_world_sa.email}"
+}
