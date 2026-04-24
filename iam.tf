@@ -24,18 +24,38 @@ resource "google_project_iam_member" "hello_world_sa_iam" {
 #   depends_on = [ google_project_service.apis ]
 # }
 
-# Grant Cloud Run Invoker role to all users (public access)
+# Grant Cloud Run Invoker role to all users (public access) (Single Region)
+# resource "google_cloud_run_service_iam_member" "public" {
+#   service  = google_cloud_run_service.hello_world_node_frontend.name
+#   location = local.cloud_run.location
+#   role     = "roles/run.invoker"
+#   member   = "allUsers"
+# }
+
+# Grant Cloud Run Invoker role to Hello World service account (Multi-Region)
 resource "google_cloud_run_service_iam_member" "public" {
-  service  = google_cloud_run_service.hello_world_node_frontend.name
-  location = local.cloud_run.location
+  for_each = google_cloud_run_service.hello_world_node_frontend
+
+  service  = each.value.name
+  location = each.value.location
   role     = "roles/run.invoker"
   member   = "allUsers"
 }
 
-# Grant Cloud Run Invoker role to Hello World service account
+# Grant Cloud Run Invoker role to Hello World service account (Single Region)
+# resource "google_cloud_run_service_iam_member" "lb_invoker" {
+#   service  = google_cloud_run_service.hello_world_node_frontend.name
+#   location = local.cloud_run.location
+#   role     = "roles/run.invoker"
+#   member   = "serviceAccount:${google_service_account.hello_world_sa.email}"
+# }
+
+# Grant Cloud Run Invoker role to Hello World service account (Multi-Region)
 resource "google_cloud_run_service_iam_member" "lb_invoker" {
-  service  = google_cloud_run_service.hello_world_node_frontend.name
-  location = local.cloud_run.location
+  for_each = google_cloud_run_service.hello_world_node_frontend
+
+  service  = each.value.name
+  location = each.value.location
   role     = "roles/run.invoker"
   member   = "serviceAccount:${google_service_account.hello_world_sa.email}"
 }

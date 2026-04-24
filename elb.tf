@@ -2,32 +2,84 @@
 # Cloud Run specific resources for External Load Balancer
 # #################################################################
 
-# Serverless Network Endpoint Group (NEG) for Cloud Run Service
+# Serverless Network Endpoint Group (NEG) for Cloud Run Service (Single Region)
+# resource "google_compute_region_network_endpoint_group" "regional_cloudrun_neg" {
+#   name                  = "regional-cloudrun-neg"
+#   network_endpoint_type = "SERVERLESS"
+#   region                = local.gcp_region
+
+#   cloud_run {
+#     service = google_cloud_run_service.hello_world_node_frontend.name
+#   }
+# }
+
+# Serverless NEG for Cloud Run Service in Multiple Regions (Multi-Region)
 resource "google_compute_region_network_endpoint_group" "regional_cloudrun_neg" {
-  name                  = "regional-cloudrun-neg"
+  for_each = google_cloud_run_service.hello_world_node_frontend
+
+  name                  = "regional-cloudrun-neg-${each.key}"
+  region                = each.key
   network_endpoint_type = "SERVERLESS"
-  region                = local.gcp_region
 
   cloud_run {
-    service = google_cloud_run_service.hello_world_node_frontend.name
+    service = each.value.name
   }
 }
 
-# Global Backend Service for Cloud Run
+# Global Backend Service for Cloud Run (Single Region)
+# resource "google_compute_backend_service" "cloudrun_external_backend" {
+#   name                  = "cloud-run-backend"
+#   protocol              = "HTTP"
+#   load_balancing_scheme = "EXTERNAL_MANAGED"
+
+#   backend {
+#     group = google_compute_region_network_endpoint_group.regional_cloudrun_neg.id
+#   }
+# }
+
+# Global Backend Service for Cloud Run with Multiple NEGs (Multi-Region)
+# resource "google_compute_backend_service" "cloudrun_external_backend" {
+#   name                  = "cloud-run-backend"
+#   protocol              = "HTTP"
+#   load_balancing_scheme = "EXTERNAL_MANAGED"
+
+#   dynamic "backend" {
+#     for_each = google_compute_region_network_endpoint_group.regional_cloudrun_neg
+#     content {
+#       group = backend.value.id
+#     }
+#   }
+# }
 resource "google_compute_backend_service" "cloudrun_external_backend" {
-  name                  = "cloud-run-backend"
+  for_each = google_compute_region_network_endpoint_group.regional_cloudrun_neg
+
+  name                  = "cloud-run-backend-${each.key}"
   protocol              = "HTTP"
   load_balancing_scheme = "EXTERNAL_MANAGED"
 
   backend {
-    group = google_compute_region_network_endpoint_group.regional_cloudrun_neg.id
+    group = each.value.id
   }
 }
 
 # URL Map for the Load Balancer
 resource "google_compute_url_map" "url_map" {
   name            = "cloud-run-url-map"
-  default_service = google_compute_backend_service.cloudrun_external_backend.id
+
+  default_route_action {
+    weighted_backend_services {
+      backend_service = google_compute_backend_service.cloudrun_external_backend["us-central1"].id
+      weight          = 50
+    }
+    weighted_backend_services {
+      backend_service = google_compute_backend_service.cloudrun_external_backend["us-west1"].id
+      weight          = 30
+    }
+    weighted_backend_services {
+      backend_service = google_compute_backend_service.cloudrun_external_backend["europe-west1"].id
+      weight          = 20
+    }
+  }
 }
 
 # SSL Certificate for the Load Balancer (using Google-managed certificate)
@@ -49,6 +101,10 @@ resource "google_compute_target_https_proxy" "https_proxy" {
 # Reserve Static Global IP Address for the Load Balancer
 resource "google_compute_global_address" "ip" {
   name = "cloud-run-ip"
+  project = local.gcp_project_id
+  address_type = "EXTERNAL"
+  purpose = "ELB_STATIC_IP"
+  # address = local.elb_static_ip
 }
 
 # Global Forwarding Rule to route traffic to the Target HTTPS Proxy

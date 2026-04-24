@@ -1,6 +1,7 @@
 locals {
   gcp_project_id               = "cloud-ai-police-v2"
   gcp_region                   = "us-central1"
+  cloudrun_regions             = ["us-central1", "us-west1", "europe-west1"]
   
   service_account_display_name = "cloud-ai-police-v2-sa"
   hello_world_sa = "hello-world-sa"
@@ -70,4 +71,6 @@ locals {
 
     dummy_domain_name = "hello-world-node-frontend.gcp.com"
   }
+
+  elb_static_ip = "34.117.199.33"
 }
