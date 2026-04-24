@@ -104,7 +104,7 @@ resource "google_compute_global_address" "ip" {
   project = local.gcp_project_id
   address_type = "EXTERNAL"
   purpose = "ELB_STATIC_IP"
-  # address = local.elb_static_ip
+  address = local.elb_static_ip
 }
 
 # Global Forwarding Rule to route traffic to the Target HTTPS Proxy

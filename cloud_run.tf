@@ -35,6 +35,7 @@ resource "google_cloud_run_service" "hello_world_node_frontend" {
     spec {
       containers {
         image = "${local.cloud_run.location}-docker.pkg.dev/${local.gcp_project_id}/${local.gar.repository_id}/hello-world:1.0.4"
+        # command = contains(local.cloudrun_active_regions, each.key) ? null : ["sh", "-c", "exit 1"]
 
         env {
           name  = "K_REGION"

@@ -2,6 +2,7 @@ locals {
   gcp_project_id               = "cloud-ai-police-v2"
   gcp_region                   = "us-central1"
   cloudrun_regions             = ["us-central1", "us-west1", "europe-west1"]
+  cloudrun_active_regions      = ["europe-west1"]
   
   service_account_display_name = "cloud-ai-police-v2-sa"
   hello_world_sa = "hello-world-sa"
